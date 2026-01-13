@@ -1,0 +1,12 @@
+[project]
+name = "poshbullet-backend"
+version = "0.1.0"
+description = "Backend API for PoshBullet"
+requires-python = ">=3.10"
+dependencies = [
+    "flask",
+    "sqlalchemy",
+    "flask-sqlalchemy",
+    "python-dotenv",
+    "uvicorn>=0.40.0",
+]

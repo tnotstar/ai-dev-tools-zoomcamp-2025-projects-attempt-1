@@ -1,0 +1,12 @@
+[project]
+name = "poshbullet-workspace"
+version = "0.1.0"
+description = "PoshBullet Workspace"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.uv.workspace]
+members = ["backend", "frontend"]
+
+# uv doesn't support 'scripts' in the workspace root in the same way as npm scripts natively across all versions without a package install,
+# but keeping this file clean ensures 'uv sync' works perfectly for the members.

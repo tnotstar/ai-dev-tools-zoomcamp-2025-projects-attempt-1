@@ -1,0 +1,93 @@
+openapi: 3.0.0
+info:
+  title: URL Sharing Platform API
+  version: 1.0.0
+  description: API for the URL Sharing Platform MVP.
+paths:
+  /:
+    get:
+      summary: Index page
+      description: Returns the main dashboard or landing page.
+      responses:
+        '200':
+          description: HTML Page
+  /auth/login/{provider}:
+    get:
+      summary: Initiate OAuth login
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, facebook]
+      responses:
+        '302':
+          description: Redirect to OAuth provider
+  /auth/callback/{provider}:
+    get:
+      summary: OAuth callback
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to index
+  /auth/logout:
+    get:
+      summary: Logout user
+      responses:
+        '302':
+          description: Redirect to index
+  /invite/generate:
+    get:
+      summary: Generate invitation link
+      responses:
+        '200':
+          description: JSON with link
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link:
+                    type: string
+  /invite/{code}:
+    get:
+      summary: Handle invitation
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to index or signup
+  /api/share:
+    post:
+      summary: Share a URL with friends
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                friends:
+                  type: array
+                  items:
+                    type: integer
+                url:
+                  type: string
+      responses:
+        '200':
+          description: HTML snippet of the new history item (for HTMX) or full redirect
+  /api/history:
+    get:
+      summary: Get sharing history
+      responses:
+        '200':
+          description: HTML list of shared URLs

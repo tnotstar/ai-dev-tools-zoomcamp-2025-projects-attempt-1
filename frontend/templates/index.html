@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoshBullet - Collaborative URL Sharing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-slate-50">
+
+    <nav class="p-6 flex justify-between items-center glass border-b border-white/10 sticky top-0 z-50">
+        <a href="/" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 hover:scale-105 transition-transform">PoshBullet</a>
+        
+        <div class="flex items-center gap-4">
+            {% if user %}
+                <div class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full border border-white/5">
+                    {% if user.avatar_url %}
+                        <img src="{{ user.avatar_url }}" class="w-8 h-8 rounded-full border border-pink-500/50">
+                    {% else %}
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-500 flex items-center justify-center font-bold">{{ user.name[0] }}</div>
+                    {% endif %}
+                    <span class="font-medium hidden sm:block">{{ user.name }}</span>
+                </div>
+                <a href="/logout" class="text-sm text-slate-400 hover:text-white transition-colors">Sign Out</a>
+            {% else %}
+                <a href="/signup" class="px-5 py-2 rounded-full bg-white/10 border border-white/10 hover:bg-white/20 transition-all font-medium">Sign In</a>
+                <a href="/signup" class="px-5 py-2 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 hover:opacity-90 transition-all font-medium shadow-lg shadow-purple-500/30">Get Started</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-12">
+        {% if user %}
+            <!-- Dashboard View -->
+            <div class="grid lg:grid-cols-12 gap-8">
+                
+                <!-- Left Column: Share & Friends -->
+                <div class="lg:col-span-4 space-y-8">
+                    
+                    <!-- Invite Card -->
+                    <div class="glass rounded-2xl p-6 shadow-xl border border-white/5">
+                        <h2 class="text-xl font-bold mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            Build Your Network
+                        </h2>
+                        <p class="text-slate-400 text-sm mb-4">Invite friends to start sharing URLs instantly.</p>
+                        <a href="/invite/generate" class="group flex items-center justify-center w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition-all border border-slate-700 hover:border-pink-500/50">
+                            <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-violet-400 font-medium group-hover:scale-105 transition-transform">Get Invite Link</span>
+                        </a>
+                    </div>
+
+                    <!-- Share URL Form -->
+                    <div class="glass rounded-2xl p-6 shadow-xl border border-white/5 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                        
+                        <h2 class="text-xl font-bold mb-4">Share a Link</h2>
+                        
+                        <form hx-post="/api/share" hx-target="#history-list" hx-swap="afterbegin" hx-indicator="#sending-indicator">
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">1. Select Friends</label>
+                                <div class="max-h-48 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                                    {% if friends %}
+                                        {% for friend in friends %}
+                                        <label class="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 cursor-pointer hover:bg-slate-800 transition-colors group">
+                                            <input type="checkbox" name="friends" value="{{ friend.id }}" class="w-5 h-5 rounded border-slate-600 text-pink-500 focus:ring-pink-500 bg-slate-700">
+                                            <div class="flex items-center gap-3">
+                                                {% if friend.avatar_url %}
+                                                    <img src="{{ friend.avatar_url }}" class="w-8 h-8 rounded-full">
+                                                {% else %}
+                                                    <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-xs text-white">{{ friend.name[0] }}</div>
+                                                {% endif %}
+                                                <span class="group-hover:text-white text-slate-300 transition-colors">{{ friend.name }}</span>
+                                            </div>
+                                        </label>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-sm text-slate-500 italic p-2">You haven't added any friends yet. Use the invite box above!</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">2. Paste URL</label>
+                                <input type="url" name="url" required placeholder="https://..." class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all text-white placeholder-slate-500">
+                            </div>
+
+                            <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-bold shadow-lg shadow-purple-900/50 transition-all hover:scale-[1.02] flex justify-center items-center gap-2">
+                                <span>Send</span>
+                                <svg id="sending-indicator" class="htmx-indicator w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: History -->
+                <div class="lg:col-span-8">
+                    <div class="glass rounded-2xl p-6 shadow-xl border border-white/5 h-full min-h-[500px] flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold flex items-center gap-3">
+                                <span class="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </span>
+                                Shared History
+                            </h2>
+                            <button hx-get="/api/history_partial" hx-target="#history-list" class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Refresh
+                            </button>
+                        </div>
+                        
+                        <div id="history-list" class="space-y-4 overflow-y-auto flex-1 custom-scrollbar pr-2">
+                            <!-- HTMX loads here. Initial content rendered by server -->
+                            {% if history %}
+                                {% for item in history %}
+                                    {% set is_me = (item.sender_id == user.id) %}
+                                    <div class="flex flex-col p-4 rounded-xl mb-3 border-l-4 {% if is_me %} border-indigo-500 bg-indigo-500/10 {% else %} border-emerald-500 bg-emerald-500/10 {% endif %} hover:bg-white/5 transition-colors">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-xs font-bold text-slate-400">{{ item.timestamp }}</span>
+                                            <span class="text-xs px-3 py-1 rounded-full {% if is_me %} bg-indigo-500/20 text-indigo-300 {% else %} bg-emerald-500/20 text-emerald-300 {% endif %} border border-white/5">
+                                                {% if is_me %} You &rarr; {{ item.receiver_name }} {% else %} {{ item.sender_name }} &rarr; You {% endif %}
+                                            </span>
+                                        </div>
+                                        <a href="{{ item.url }}" target="_blank" class="text-blue-400 hover:text-blue-300 font-medium truncate py-1 block flex items-center gap-2 group-hover:underline">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                            {{ item.url }}
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="flex flex-col items-center justify-center p-12 text-slate-500">
+                                    <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                                    <p>No history yet. Start sharing!</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% else %}
+            <!-- Landing View (Not Logged In) -->
+            <div class="relative flex flex-col items-center justify-center min-h-[60vh] text-center">
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+                
+                <h1 class="text-6xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 mb-6 py-2">
+                    Share Effortlessly.
+                </h1>
+                <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mb-12 font-light leading-relaxed">
+                    Collaborate with your friends in real-time. Share important links and keep a unified history in one beautiful collaborative space.
+                </p>
+                
+                <div class="flex gap-6">
+                    <a href="/signup" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-bold text-lg shadow-xl shadow-purple-900/40 transform hover:-translate-y-1 transition-all">
+                        Get Started
+                    </a>
+                    <a href="/signup" class="px-8 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md text-white font-semibold text-lg transition-all">
+                        Sign In
+                    </a>
+                </div>
+
+                <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl opacity-80">
+                    <div class="glass p-6 rounded-xl">
+                        <div class="text-pink-400 text-4xl mb-3">🚀</div>
+                        <h3 class="font-bold text-lg mb-2">Instant Sharing</h3>
+                        <p class="text-sm text-slate-400">Share URLs with a single click to anyone in your friend list.</p>
+                    </div>
+                    <div class="glass p-6 rounded-xl">
+                        <div class="text-violet-400 text-4xl mb-3">🔒</div>
+                        <h3 class="font-bold text-lg mb-2">Secure & Private</h3>
+                        <p class="text-sm text-slate-400">Your links are only visible to the people you choose.</p>
+                    </div>
+                    <div class="glass p-6 rounded-xl">
+                        <div class="text-indigo-400 text-4xl mb-3">📜</div>
+                        <h3 class="font-bold text-lg mb-2">History Log</h3>
+                        <p class="text-sm text-slate-400">Never lose a link again. Keep track of everything shared.</p>
+                    </div>
+                </div>
+
+            </div>
+        {% endif %}
+    </main>
+
+    <footer class="mt-12 py-8 text-center text-slate-500 text-sm border-t border-white/5">
+        &copy; 2026 PoshBullet MVP. Built with Flask, HTMX & Tailwind.
+    </footer>
+
+</body>
+</html>

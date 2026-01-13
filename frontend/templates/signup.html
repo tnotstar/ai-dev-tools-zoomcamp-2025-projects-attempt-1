@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - PoshBullet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-slate-50 flex items-center justify-center p-4">
+
+    <div class="relative w-full max-w-md">
+        <!-- Background Orbs -->
+        <div class="absolute -top-20 -left-20 w-60 h-60 bg-pink-600/30 rounded-full blur-[80px]"></div>
+        <div class="absolute -bottom-20 -right-20 w-60 h-60 bg-indigo-600/30 rounded-full blur-[80px]"></div>
+
+        <div class="glass p-8 rounded-3xl shadow-2xl relative z-10">
+            <div class="text-center mb-8">
+                <a href="/" class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 hover:opacity-80 transition-opacity">PoshBullet</a>
+                <p class="mt-2 text-slate-400">Join the collaboration platform</p>
+                {% if message %}
+                    <div class="mt-4 p-3 bg-pink-500/20 border border-pink-500/30 rounded-lg text-pink-200 text-sm">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="space-y-4">
+                <a href="/auth/login/google" class="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-white text-slate-800 font-semibold hover:bg-slate-100 transition-all transform hover:-translate-y-0.5 shadow-lg group">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
+                    <span>Continue with Google</span>
+                </a>
+
+                <a href="/auth/login/facebook" class="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-[#1877F2] text-white font-semibold hover:bg-[#1864D9] transition-all transform hover:-translate-y-0.5 shadow-lg">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.15 5.96C15.21 5.96 16.12 6.04 16.12 6.04V8.51H15.01C13.77 8.51 13.38 9.28 13.38 10.07V12.06H16.15L15.71 14.96H13.38V21.96C18.16 21.21 21.82 17.06 21.82 12.06C21.82 6.53 17.32 2.04 12 2.04Z"></path></svg>
+                    <span>Continue with Facebook</span>
+                </a>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-white/10 text-center">
+                <p class="text-xs text-slate-500">By continuing, you agree to our Terms of Service and Privacy Policy.</p>
+                
+                <!-- Mock Login Helper for Local Dev without Keys -->
+                <div class="mt-6 p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+                    <p class="text-xs text-slate-400 mb-2 uppercase tracking-widest font-bold">Developer Mode</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="/auth/callback/google?mock=true" class="text-xs py-2 px-3 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 text-center">Mock Google</a>
+                        <a href="/auth/callback/facebook?mock=true" class="text-xs py-2 px-3 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 text-center">Mock Facebook</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
