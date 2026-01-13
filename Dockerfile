@@ -21,10 +21,9 @@ RUN cd backend && uv sync
 RUN cd frontend && uv sync
 
 # Expose ports
-# 5000: Frontend
-# 5001: Backend
-EXPOSE 5000
-EXPOSE 5001
+# 8080: Frontend (external access)
+# 8081: Backend (internal only, called by frontend via localhost)
+EXPOSE 8080
 
 # Run the integrated startup script
 CMD ["uv", "run", "python", "main.py"]

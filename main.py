@@ -13,16 +13,16 @@ def run_servers():
     try:
         # Run backend: Change dir to backend so uv finds backend/pyproject.toml
         # Using uvicorn with WSGI interface and reload enabled
-        backend_cmd = ["uv", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5001", "--reload", "--interface", "wsgi"]
+        backend_cmd = ["uv", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8081", "--reload", "--interface", "wsgi"]
         backend_proc = subprocess.Popen(backend_cmd, env=env, cwd=os.path.join(os.getcwd(), "backend"))
         procs.append(backend_proc)
         
         # Give backend a moment to initialize
         time.sleep(2)
 
-        print("[INFO] Starting Frontend Server (Port 5000)...")
+        print("[INFO] Starting Frontend Server (Port 8080)...")
         # Run frontend: Change dir to frontend so uv finds frontend/pyproject.toml
-        frontend_cmd = ["uv", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000", "--reload", "--interface", "wsgi"]
+        frontend_cmd = ["uv", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080", "--reload", "--interface", "wsgi"]
         frontend_proc = subprocess.Popen(frontend_cmd, env=env, cwd=os.path.join(os.getcwd(), "frontend"))
         procs.append(frontend_proc)
         
