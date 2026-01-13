@@ -129,7 +129,7 @@ def add_friendship():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
         
-    return jsonify({'status': 'ok'})
+    return jsonify({'status': 'ok'}), 201
 
 @app.route('/api/shares', methods=['POST'])
 def share_url():
@@ -150,7 +150,7 @@ def share_url():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
         
-    return jsonify({'status': 'ok'})
+    return jsonify({'status': 'ok'}), 201
 
 if __name__ == '__main__':
     host = os.getenv('HOST', '0.0.0.0')

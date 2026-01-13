@@ -97,19 +97,42 @@ This script will:
 3.  Start the Frontend on port 5000.
 4.  Open `http://localhost:5000`.
 
-## Containerization (Planned)
+## Containerization
 
-Support for Docker is planned. The architecture is ready for containerization:
-*   `backend/Dockerfile` -> Exposes port 5001.
-*   `frontend/Dockerfile` -> Exposes port 5000.
-*   `docker-compose.yaml` -> Orchestrates both services.
+Support for Docker is ready. The architecture is ready for containerization:
+*   `Dockerfile` -> Exposes port 5000.
 
-## Integration Testing (Planned)
+## Testing
 
-Integration tests will cover:
-1.  User flow: Signup -> Invite Friend -> Share URL.
-2.  Database constraint checks (unique providers).
-3.  Cross-service communication (Frontend -> Backend).
+The project includes a comprehensive integration test suite covering both Backend API logic and Frontend UI flows.
+
+### Prerequisites
+Make sure you have installed the testing dependencies:
+```bash
+uv sync
+```
+
+### Running Tests
+You can run tests for both services with a single command that provides a coverage report:
+
+```bash
+uv run python -m pytest backend/tests frontend/tests --cov=backend --cov=frontend
+```
+
+### Test Scope
+1.  **Backend Integration (`backend/tests/test_api.py`)**:
+    *   Verifies Database interactions (SQLAlchemy + SQLite in-memory).
+    *   Tests API endpoints for User creation, Friendships, and URL sharing.
+2.  **Frontend UI (`frontend/tests/test_ui.py`)**:
+    *   **Auth Flow**: Mocks user sessions to verify Dashboard access.
+    *   **HTMX Interactions**: Tests that sharing a URL returns the correct HTML fragment for dynamic insertion.
+    *   **Invite Logic**: Verifies correct handling of invite links (redirects to signup if logged out, calls backend if logged in).
+
+### Configuration
+Test fixtures are defined in:
+*   `backend/tests/conftest.py`: Sets up a temporary in-memory database and Flask test client.
+*   `frontend/tests/conftest.py`: Mocks the `BACKEND_URL` and creates a session-enabled test client.
+
 
 ## Deployment
 
@@ -257,3 +280,41 @@ A GitHub Actions workflow is planned to:
 > The modified package.json scripts needed to run these tests.
 >
 > The updated text snippet for the README.md.
+
+## Integration tests
+
+>Task: Implement a robust Integration Testing suite and a comprehensive README.md for the URL Sharing Platform.
+>
+>1. Testing Strategy:
+>
+>    Use pytest and flask-testing to simulate client-server interactions.
+>
+>    Test Cases to cover:
+>
+>        Auth Flow: Mocking a session and verifying access to the dashboard.
+>
+>        Friendship Logic: Verifying that visiting an invite link updates the friendships table for both users.
+>
+>        HTMX Interaction: A test that sends a POST request to share a URL and asserts that the response contains the expected HTML fragment (not just a 200 OK, but the actual <li> or <div> with the new link).
+>
+>    Database: Ensure tests use an in-memory SQLite database (sqlite:///:memory:) to keep tests fast and isolated.
+>
+>2. Documentation (README.md):
+>
+>    Create a professional README.md including:
+>
+>        Project Overview: Brief description of the stack (Flask + HTMX + uv).
+>
+>        Prerequisites: Mentioning uv.
+>
+>        Setup & Installation: Commands to sync environment and database.
+>
+>        Running the App: The command to start the development server.
+>
+>        Testing: The specific command to execute the test suite.
+>
+>3. Technical Constraints:
+>
+>    Provide the exact terminal command used to run tests with coverage report.
+>
+>    Ensure all test fixtures (client, app, db) are clearly defined in a conftest.py or within the test file.
