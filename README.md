@@ -1,5 +1,9 @@
 # PoshBullet - Collaborative URL Sharing Platform
 
+## Live Demo
+
+https://ai-dev-tools-zoomcamp-2025-projects-attempt-1-428800185377.europe-southwest1.run.app/
+
 ## Problem Description
 
 PoshBullet is a minimalistic, secure, and collaborative URL sharing platform designed to streamline the sharing of links between friends and colleagues. In a world of fragmented communication channels, PoshBullet offers a unified space where users can invite friends, share URLs instantly, and maintain a persistent history of shared links.
@@ -136,16 +140,52 @@ Test fixtures are defined in:
 
 ## Deployment
 
-The application is ready for cloud deployment (e.g., Google Cloud Run).
-*   **Requirements**: Two services (Frontend, Backend).
-*   **Environment**: Set `BACKEND_URL` in frontend service to point to the backend service URL.
+The application is architected for seamless deployment on **Google Cloud Run** using a single-container pattern.
 
-## CI/CD Pipeline (Planned)
+### Docker Strategy
 
-A GitHub Actions workflow is planned to:
-1.  Lint code with `ruff`.
-2.  Run `pytest` suites.
-3.  Build and Push Docker images upon success.
+The `Dockerfile` builds a unified image containing both the Frontend and Backend services.
+*   **Frontend**: Runs on port `8080` (mapped to Cloud Run's public port).
+*   **Backend**: Runs on port `8081` (internal localhost access only).
+*   **Entrypoint**: `uv run python main.py` orchestrates both processes.
+
+### Deploy to Cloud Run
+
+1.  **Build & Tag**:
+    ```bash
+    docker build -t gcr.io/YOUR_PROJECT/poshbullet .
+    ```
+2.  **Push**:
+    ```bash
+    docker push gcr.io/YOUR_PROJECT/poshbullet
+    ```
+3.  **Deploy**:
+    ```bash
+    gcloud run deploy poshbullet \
+      --image gcr.io/YOUR_PROJECT/poshbullet \
+      --platform managed \
+      --port 8080 \
+      --allow-unauthenticated
+    ```
+
+## CI/CD Pipeline
+
+The project implements a Continuous Integration and Deployment pipeline (e.g., via GitHub Actions) to automate quality checks and release.
+
+### Workflow Stages
+
+1.  **Test**: Triggered on every push.
+    *   Installs `uv`.
+    *   Runs `uv run python -m pytest ...`.
+    *   Verifies 100% pass rate before proceeding.
+
+2.  **Build**:
+    *   Builds the Docker image `poshbullet-integrated`.
+
+3.  **Deploy**:
+    *   Authenticates with Google Cloud.
+    *   Pushes the image to Artifact Registry.
+    *   Updates the Cloud Run service revision.
 
 ---
 
