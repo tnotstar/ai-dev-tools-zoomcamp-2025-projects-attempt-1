@@ -12,7 +12,7 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev_secret_key')
 app.config['SESSION_COOKIE_NAME'] = 'poshbullet-session'
 
 # Backend Config
-BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:5001')
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:8081')
 
 # OAuth Setup
 oauth = OAuth(app)
